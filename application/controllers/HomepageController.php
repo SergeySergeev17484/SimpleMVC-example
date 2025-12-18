@@ -2,6 +2,8 @@
 
 namespace application\controllers;
 
+use application\models\Note;
+
 /**
  * Контроллер для домашней страницы
  */
@@ -22,7 +24,17 @@ class HomepageController extends \ItForFree\SimpleMVC\MVC\Controller
      */
     public function indexAction()
     {
-        $this->view->addVar('homepageTitle', $this->homepageTitle); // передаём переменную по view
+        $Note = new Note();
+        $notes = $Note->getActiveList(100)['results'];
+        
+        // Загружаем авторов для каждой заметки
+        foreach ($notes as $note) {
+            $authors = $note->getAuthors();
+            $note->authors = $authors;
+        }
+        
+        $this->view->addVar('homepageTitle', $this->homepageTitle);
+        $this->view->addVar('notes', $notes);
         $this->view->render('homepage/index.php');
     }
 }
